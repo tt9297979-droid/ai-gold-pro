@@ -58,3 +58,45 @@ setInterval(async ()=>{
 <button onclick="checkVIP()">Login</button>
 
 <h2 id="signal">รอสัญญาณ...</h2>
+<h3>💳 อัปโหลดสลิป</h3>
+
+<input type="file" id="slip">
+<button onclick="uploadSlip()">ส่งสลิป</button>
+
+<p id="status"></p>
+
+<script>
+async function uploadSlip(){
+
+  const file = document.getElementById("slip").files[0]
+
+  const reader = new FileReader()
+
+  reader.onload = async function(){
+
+    const base64 = reader.result
+
+    let r = await fetch('/api/verifySlip',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        slip_image: base64,
+        user_id: "demo_user"
+      })
+    })
+
+    let d = await r.json()
+
+    if(d.success){
+      document.getElementById("status").innerText =
+      "✅ ได้ KEY: " + d.key
+    }else{
+      document.getElementById("status").innerText =
+      "❌ สลิปไม่ถูกต้อง"
+    }
+
+  }
+
+  reader.readAsDataURL(file)
+}
+</script>
