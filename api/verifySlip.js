@@ -16,7 +16,8 @@ export default async function handler(req, res) {
   const data = await r.json()
 
   // ✅ ตรวจเงิน
-  if (data?.data?.amount == 99) {
+  if (data?.data?.amount == 199 &&
+  data.data.receiver.name.includes("พีระพัฒน์")
 
     // 👉 สร้าง KEY อัตโนมัติ
     const keyRes = await fetch(`${process.env.BASE_URL}/api/createKey`, {
