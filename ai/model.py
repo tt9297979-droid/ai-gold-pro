@@ -1,37 +1,47 @@
 import yfinance as yf
 import numpy as np
 import json
-from liquidity import liquidity
-from lstm import predict
 
-data = yf.download("GC=F", period="3d", interval="5m")
+data = yf.download("GC=F", period="5d", interval="5m")
 
-closes = data["Close"].dropna().values
+close = data["Close"].dropna().values
 volume = data["Volume"].dropna().values
 
-price = closes[-1]
+price = close[-1]
 
-ema5 = np.mean(closes[-5:])
-ema20 = np.mean(closes[-20:])
+# EMA
+ema9 = np.mean(close[-9:])
+ema21 = np.mean(close[-21:])
+ema50 = np.mean(close[-50:])
 
-vol = np.mean(volume[-10:])
+# RSI
+delta = np.diff(close)
+gain = np.maximum(delta,0).mean()
+loss = -np.minimum(delta,0).mean()
+rsi = 100 - (100/(1+gain/loss)) if loss!=0 else 50
 
-pred = predict(closes)
+# Volume spike
+vol_now = volume[-1]
+vol_avg = np.mean(volume[-20:])
 
-liq = liquidity(closes)
+# Liquidity
+liq_high = max(close[-50:])
+liq_low = min(close[-50:])
 
+# Trend logic
 signal = "HOLD"
-confidence = 50
+confidence = 60
 
-if ema5 > ema20 and pred > price and vol > np.mean(volume):
+if ema9 > ema21 > ema50 and rsi < 65 and vol_now > vol_avg:
     signal = "BUY"
-    confidence = 90
+    confidence = 88
 
-elif ema5 < ema20 and pred < price and vol > np.mean(volume):
+elif ema9 < ema21 < ema50 and rsi > 35 and vol_now > vol_avg:
     signal = "SELL"
-    confidence = 90
+    confidence = 88
 
-tp = price + 10 if signal=="BUY" else price - 10
+# TP/SL Smart Money
+tp = liq_high if signal=="BUY" else liq_low
 sl = price - 5 if signal=="BUY" else price + 5
 
 print(json.dumps({
@@ -40,6 +50,6 @@ print(json.dumps({
     "tp":round(tp,2),
     "sl":round(sl,2),
     "confidence":confidence,
-    "prediction":pred,
-    "liquidity":liq
+    "liquidity_high":liq_high,
+    "liquidity_low":liq_low
 }))
