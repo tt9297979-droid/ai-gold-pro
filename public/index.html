@@ -46,3 +46,15 @@ setInterval(load,300000)
 
 </body>
 </html>
+setInterval(async ()=>{
+  let r = await fetch('/api/signal')
+  let d = await r.json()
+
+  document.getElementById("signal").innerText =
+  `${d.signal} | TP: ${d.tp} | SL: ${d.sl}`
+
+}, 300000)
+<input id="key" placeholder="ใส่ KEY VIP">
+<button onclick="checkVIP()">Login</button>
+
+<h2 id="signal">รอสัญญาณ...</h2>
