@@ -1,20 +1,23 @@
 // api/auth.js
-import fs from "fs"
+import { createClient } from '@supabase/supabase-js'
 
-export default function handler(req,res){
+const supabase = createClient(process.env.URL, process.env.KEY)
 
-let {key} = req.query
+export default async function handler(req,res){
 
-let db = JSON.parse(fs.readFileSync("db/db.json"))
+const {key} = req.query
 
-if(!db.keys[key]){
-  return res.json({vip:false})
-}
+const { data } = await supabase
+.from('keys')
+.select('*')
+.eq('key', key)
+.single()
 
-if(Date.now() > db.keys[key].expire){
+if(!data) return res.json({vip:false})
+
+if(Date.now() > data.expire){
   return res.json({vip:false, expired:true})
 }
 
 res.json({vip:true})
-
 }
