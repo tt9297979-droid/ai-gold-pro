@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>AI GOLD PRO</title>
+<link rel="manifest" href="/manifest.json">
+<script src="https://s3.tradingview.com/tv.js"></script>
+</head>
+
+<body style="background:black;color:white">
+
+<h1>🔥 AI GOLD PRO</h1>
+
+<div id="chart" style="height:400px;"></div>
+
+<input id="key" placeholder="VIP KEY">
+<button onclick="login()">Login</button>
+
+<h2 id="signal"></h2>
+
+<button onclick="pay()">💳 สมัคร VIP</button>
+<img id="qr" width="200">
+
+<script>
+let vip = false
+
+async function login(){
+  let key = document.getElementById("key").value
+  let r = await fetch(`/api/auth?key=${key}`)
+  let d = await r.json()
+  vip = d.vip
+}
+
+async function load(){
+  let r = await fetch('/api/signal')
+  let d = await r.json()
+
+  if(vip){
+    signal.innerText = JSON.stringify(d,null,2)
+  }else{
+    signal.innerText = "Signal: " + d.signal
+  }
+}
+
+setInterval(load,300000)
+</script>
+
+</body>
+</html>
