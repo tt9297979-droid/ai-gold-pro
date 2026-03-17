@@ -1,13 +1,13 @@
-<h1>📊 ADMIN</h1>
+<h1>🔥 ADMIN PANEL</h1>
 
-<button onclick="load()">Load Data</button>
+<button onclick="load()">โหลดข้อมูล</button>
 
-<pre id="data"></pre>
+<pre id="out"></pre>
 
 <script>
 async function load(){
-  let r = await fetch('/api/signal')
+  let r = await fetch('/api/admin')
   let d = await r.json()
-  data.innerText = JSON.stringify(d,null,2)
+  out.innerText = JSON.stringify(d,null,2)
 }
 </script>
