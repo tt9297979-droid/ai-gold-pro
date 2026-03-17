@@ -1,0 +1,5 @@
+create table keys (
+  key text primary key,
+  user_id uuid,
+  expire bigint
+);
