@@ -100,3 +100,68 @@ async function uploadSlip(){
   reader.readAsDataURL(file)
 }
 </script>
+<h2>💳 ชำระเงิน VIP</h2>
+
+<img src="/qr.png" width="250">
+
+<p>💰 ราคา: 199 บาท</p>
+
+<p>📱 สแกนจ่าย → แล้วอัปโหลดสลิปด้านล่าง</p>
+<h3>📤 อัปโหลดสลิป</h3>
+
+<input type="file" id="slip">
+<button onclick="uploadSlip()">ยืนยันการชำระเงิน</button>
+
+<p id="status"></p>
+<script>
+async function uploadSlip(){
+
+  const file = document.getElementById("slip").files[0]
+
+  const reader = new FileReader()
+
+  reader.onload = async function(){
+
+    let base64 = reader.result
+
+    let r = await fetch('/api/verifySlip',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        slip_image: base64,
+        user_id: "user001"
+      })
+    })
+
+    let d = await r.json()
+
+    if(d.success){
+      document.getElementById("status").innerText =
+      "✅ ได้ KEY: " + d.key
+    }else{
+      document.getElementById("status").innerText =
+      "❌ สลิปไม่ถูกต้อง"
+    }
+
+  }
+
+  reader.readAsDataURL(file)
+}
+</script>
+<div style="background:#111;padding:20px;border-radius:15px;width:300px">
+
+<h2>💳 สมัคร VIP</h2>
+
+<img src="/qr.png" width="200">
+
+<p>ราคา: 199 บาท</p>
+
+<p style="color:gray">สแกนแล้วอัปโหลดสลิป</p>
+
+<input type="file" id="slip"><br><br>
+
+<button onclick="uploadSlip()">ยืนยัน</button>
+
+<p id="status"></p>
+
+</div>
