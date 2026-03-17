@@ -1,17 +1,24 @@
-import fs from "fs"
+import { createClient } from '@supabase/supabase-js'
 
-export default function handler(req,res){
+const supabase = createClient(process.env.URL, process.env.KEY)
 
-let {user} = req.query
+export default async function handler(req,res){
 
-let db = JSON.parse(fs.readFileSync("db/db.json"))
+const {username,password} = req.body
 
-if(!db.users.includes(user)){
-  db.users.push(user)
+// Admin fix
+if(username === "Aa100698" && password === "123456"){
+  return res.json({ok:true, role:"admin"})
 }
 
-fs.writeFileSync("db/db.json", JSON.stringify(db))
+const { data } = await supabase
+.from('users')
+.select('*')
+.eq('username', username)
+.eq('password', password)
+.single()
 
-res.json({ok:true})
+if(!data) return res.json({ok:false})
 
+res.json({ok:true, role:data.role, user:data})
 }
